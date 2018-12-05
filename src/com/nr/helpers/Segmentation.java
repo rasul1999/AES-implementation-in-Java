@@ -5,22 +5,20 @@ import java.util.ArrayList;
 
 /**
  * byteArray is byte representation of plain text.
- *
- * State is two dimensional(4x4) array of bytes. All operations in AES are performed on a state.
  */
 
 public class Segmentation {
 
+    private static ArrayList<State> states = new ArrayList<>();
+
     public static ArrayList<State> toStates(byte[] byteArray) {
 
-        ArrayList<State> states = new ArrayList<>();
-
         int startIndex = 0;
-        int endIndex = 128;
+        int endIndex = 16;
 
         while (endIndex <= byteArray.length) {
 
-            byte[] stateArray = new byte[128];
+            byte[] stateArray = new byte[16];
             int counter = 0;
 
             for (int i = startIndex; i < endIndex; i++) {
@@ -29,13 +27,13 @@ public class Segmentation {
 
             states.add(new State(stateArray));
 
-            startIndex += 128;
-            endIndex += 128;
+            startIndex += 16;
+            endIndex += 16;
         }
 
-        if (endIndex - 128 != byteArray.length) {
+        if (endIndex - 16 != byteArray.length) {
 
-            byte[] stateArray = new byte[128];
+            byte[] stateArray = new byte[16];
             int counter = 0;
 
             for (int i = startIndex; i < byteArray.length; i++) {
@@ -44,7 +42,7 @@ public class Segmentation {
 
             byte b = 0;
 
-            for (int i = counter; i < 128; i++) {
+            for (int i = counter; i < 16; i++) {
                 stateArray[i] = b;
             }
 
