@@ -8,9 +8,9 @@ public class Word {
 
     private HexByte[] hexBytes = new HexByte[4];
 
-    public HexByte[] get(int index) {
+    public HexByte get(int index) {
         if (index > 3) throw new ArrayIndexOutOfBoundsException("A word has only 4 bytes");
-        return hexBytes;
+        return hexBytes[index];
     }
 
     public Word(byte[] bytes) {

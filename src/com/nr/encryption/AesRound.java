@@ -1,18 +1,28 @@
 package com.nr.encryption;
 
+import com.nr.helpers.SBox;
 import com.nr.helpers.State;
+import com.nr.helpers.Word;
 
 public class AesRound {
 
     private State plainTextState, keyState, currentState;
+    private byte[][] diffusionMatrix;
 
     public AesRound(State plainTextState, State keyState) {
 
         this.keyState = keyState;
         this.plainTextState = plainTextState;
+
+        diffusionMatrix = new byte[][] {
+                {2, 3, 1, 1},
+                {1, 2, 3, 1},
+                {1, 1, 2, 3},
+                {3, 1, 1, 2}
+        };
     }
 
-    public void addRoundKey() {
+    private void addRoundKey() {
 
         byte[][] textStateMatrix = plainTextState.getStateMatrix();
         byte[][] keyStateMatrix = keyState.getStateMatrix();
@@ -31,5 +41,48 @@ public class AesRound {
         currentState = new State(currentBlockArray);
     }
 
+    private void substituteBytes() {
 
+        byte[][] sBoxMatrix = SBox.getSBox().getSBoxMatrix();
+        byte[][] currentStateMatrix = currentState.getStateMatrix();
+        Word[] currentStateWordVector = currentState.getWordVector();
+
+        for (int i = 0; i < 4; i++) {
+
+            for (int j = 0; j < 4; j++) {
+
+                byte row = currentStateWordVector[i].get(j).row;
+                byte col = currentStateWordVector[i].get(j).column;
+
+                currentStateMatrix[i][j] = sBoxMatrix[row][col];
+            }
+        }
+        currentState.updateState(State.Changed.STATE_MATRIX);
+    }
+
+    private void shiftRows() {
+
+        byte[][] currentStateMatrix = currentState.getStateMatrix();
+
+        for (int i = 1; i < 4; i++) {
+
+            byte[] row = new byte[4];
+
+            for (int j = i; j < 4; j++) {
+                row[i - j] = currentStateMatrix[i][j];
+            }
+            int counter = 0;
+            for (int j = 4 - i; j < 4; j++) {
+                row[j] = currentStateMatrix[i][counter++];
+            }
+        }
+        currentState.updateState(State.Changed.STATE_MATRIX);
+    }
+
+    private void mixColumns() {
+
+        for (int i = 0; i < 4; i++) {
+            
+        }
+    }
 }
