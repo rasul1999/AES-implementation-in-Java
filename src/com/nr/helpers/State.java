@@ -12,9 +12,11 @@ public class State {
 
     private byte[][] stateMatrix;
     private Word[] wordVector;
+    private byte paddingSize;
 
-    public State(byte[] blockArray) {
+    public State(byte[] blockArray, byte paddingSize) {
 
+        this.paddingSize = paddingSize;
         stateMatrix = new byte[4][4];
 
         int counter = 0;
@@ -69,4 +71,6 @@ public class State {
     public Word[] getWordVector() {
         return wordVector;
     }
+
+    public byte getPaddingSize() { return paddingSize; }
 }

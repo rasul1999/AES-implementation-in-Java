@@ -13,6 +13,11 @@ public class Word {
         return hexBytes[index];
     }
 
+    public void set(int index, HexByte hexByte) {
+        if (index > 3) throw new ArrayIndexOutOfBoundsException("A word has only 4 bytes");
+        hexBytes[index] = hexByte;
+    }
+
     public Word(byte[] bytes) {
 
         for (int i = 0; i < 4; i++) {

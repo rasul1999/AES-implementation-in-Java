@@ -25,7 +25,7 @@ public class Segmentation {
                 stateArray[counter++] = byteArray[i];
             }
 
-            states.add(new State(stateArray));
+            states.add(new State(stateArray, (byte)0));
 
             startIndex += 16;
             endIndex += 16;
@@ -41,12 +41,12 @@ public class Segmentation {
             }
 
             byte b = 0;
-
+            byte paddingSize = (byte)(16 - counter);
             for (int i = counter; i < 16; i++) {
                 stateArray[i] = b;
             }
 
-            states.add(new State(stateArray));
+            states.add(new State(stateArray, paddingSize));
         }
 
         return states;

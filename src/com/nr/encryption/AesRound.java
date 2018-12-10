@@ -1,8 +1,8 @@
 package com.nr.encryption;
 
-import com.nr.helpers.SBox;
+import com.nr.helpers.GaloisField;
 import com.nr.helpers.State;
-import com.nr.helpers.Word;
+
 
 public class AesRound {
 
@@ -38,26 +38,7 @@ public class AesRound {
                 currentBlockArray[counter++] = (byte)(textStateMatrix[i][j] ^ keyStateMatrix[i][j]);
             }
         }
-        currentState = new State(currentBlockArray);
-    }
-
-    private void substituteBytes() {
-
-        byte[][] sBoxMatrix = SBox.getSBox().getSBoxMatrix();
-        byte[][] currentStateMatrix = currentState.getStateMatrix();
-        Word[] currentStateWordVector = currentState.getWordVector();
-
-        for (int i = 0; i < 4; i++) {
-
-            for (int j = 0; j < 4; j++) {
-
-                byte row = currentStateWordVector[i].get(j).row;
-                byte col = currentStateWordVector[i].get(j).column;
-
-                currentStateMatrix[i][j] = sBoxMatrix[row][col];
-            }
-        }
-        currentState.updateState(State.Changed.STATE_MATRIX);
+        currentState = new State(currentBlockArray, (byte)0);
     }
 
     private void shiftRows() {
@@ -81,8 +62,20 @@ public class AesRound {
 
     private void mixColumns() {
 
+        byte[][] currentStateMatrix = currentState.getStateMatrix();
+
         for (int i = 0; i < 4; i++) {
-            
+
+            for (int j = 0; j < 4; j++) {
+
+                byte sum = 0;
+                for (int g = 0; g < 4; g++) {
+
+                    sum ^= GaloisField.multiply(currentStateMatrix[g][i], diffusionMatrix[j][g]);
+                }
+                currentStateMatrix[j][i] = sum;
+            }
         }
+        currentState.updateState(State.Changed.STATE_MATRIX);
     }
 }

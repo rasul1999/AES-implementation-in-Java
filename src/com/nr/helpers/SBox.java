@@ -49,4 +49,24 @@ public class SBox {
     public byte[][] getSBoxMatrix() {
         return sBoxMatrix;
     }
+
+
+    public static void substituteBytes(State currentState) {
+
+        byte[][] sBoxMatrix = getSBox().getSBoxMatrix();
+        byte[][] currentStateMatrix = currentState.getStateMatrix();
+        Word[] currentStateWordVector = currentState.getWordVector();
+
+        for (int i = 0; i < 4; i++) {
+
+            for (int j = 0; j < 4; j++) {
+
+                byte row = currentStateWordVector[i].get(j).row;
+                byte col = currentStateWordVector[i].get(j).column;
+
+                currentStateMatrix[i][j] = sBoxMatrix[row][col];
+            }
+        }
+        currentState.updateState(State.Changed.STATE_MATRIX);
+    }
 }
