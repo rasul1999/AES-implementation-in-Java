@@ -1,5 +1,7 @@
 package com.nr.helpers;
 
+import com.nr.Resources;
+
 import java.io.*;
 
 
@@ -8,12 +10,13 @@ import java.io.*;
  */
 public class SBox {
 
-    private byte[][] sBoxMatrix;
+    private int[][] sBoxMatrix;
     private static SBox sBox = null;
 
     private SBox(File file) {
 
-        sBoxMatrix = new byte[16][16];
+        System.out.println("In SBox creation"); //TODO: delete line
+        sBoxMatrix = new int[16][16];
 
         int counter = 0;
 
@@ -24,7 +27,7 @@ public class SBox {
 
                 String[] hexArr = line.split("\\s");
                 for (int i = 0; i < hexArr.length; i++) {
-                    sBoxMatrix[counter][i] = Byte.parseByte(hexArr[i], 16);
+                    sBoxMatrix[counter][i] = Integer.parseInt(hexArr[i], 16);
                 }
                 counter++;
             }
@@ -40,29 +43,31 @@ public class SBox {
     public static SBox getSBox() {
 
         if (sBox == null) {
-            // TODO: get path to sbox from properties file
-            sBox = new SBox(new File("path_to_sbox"));
+
+            String fileName = Resources.getProperty("path_to_sbox");
+            sBox = new SBox(new File(fileName));
         }
         return sBox;
     }
 
-    public byte[][] getSBoxMatrix() {
+    public int[][] getSBoxMatrix() {
         return sBoxMatrix;
     }
 
 
     public static void substituteBytes(State currentState) {
 
-        byte[][] sBoxMatrix = getSBox().getSBoxMatrix();
-        byte[][] currentStateMatrix = currentState.getStateMatrix();
+        System.out.println("In SBox substituteBytes"); //TODO: delete line
+        int[][] sBoxMatrix = getSBox().getSBoxMatrix();
+        int[][] currentStateMatrix = currentState.getStateMatrix();
         Word[] currentStateWordVector = currentState.getWordVector();
 
         for (int i = 0; i < 4; i++) {
 
             for (int j = 0; j < 4; j++) {
 
-                byte row = currentStateWordVector[i].get(j).row;
-                byte col = currentStateWordVector[i].get(j).column;
+                int row = currentStateWordVector[i].get(j).row;
+                int col = currentStateWordVector[i].get(j).column;
 
                 currentStateMatrix[i][j] = sBoxMatrix[row][col];
             }

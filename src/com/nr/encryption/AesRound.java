@@ -1,56 +1,73 @@
 package com.nr.encryption;
 
 import com.nr.helpers.GaloisField;
+import com.nr.helpers.SBox;
 import com.nr.helpers.State;
+import com.nr.key_generation.Key;
 
 
 public class AesRound {
 
-    private State plainTextState, keyState, currentState;
-    private byte[][] diffusionMatrix;
+    private State keyState, currentState;
+    private int[][] diffusionMatrix;
+    private static int roundCount = 0;
 
-    public AesRound(State plainTextState, State keyState) {
 
-        this.keyState = keyState;
-        this.plainTextState = plainTextState;
+    public AesRound(State plainTextState, Key key) throws Exception {
 
-        diffusionMatrix = new byte[][] {
+        System.out.println("In AesRound constructor"); //TODO: delete line
+        keyState = key.getState();
+        currentState = plainTextState;
+
+        diffusionMatrix = new int[][] {
                 {2, 3, 1, 1},
                 {1, 2, 3, 1},
                 {1, 1, 2, 3},
                 {3, 1, 1, 2}
         };
+
+        if (roundCount == 0) {
+            addRoundKey();
+        }
+        SBox.substituteBytes(currentState);
+        shiftRows();
+        if (roundCount != 9) {
+            mixColumns();
+        }
+        key.switchToNextKey();
+        addRoundKey();
+        if (roundCount == 9) {
+            roundCount = 0;
+        }
     }
 
     private void addRoundKey() {
 
-        byte[][] textStateMatrix = plainTextState.getStateMatrix();
-        byte[][] keyStateMatrix = keyState.getStateMatrix();
-        byte[][] currentStateMatrix = new byte[4][4];
+        System.out.println("In addRoundKey"); //TODO: delete line
+        int[][] textStateMatrix = currentState.getStateMatrix();
+        int[][] keyStateMatrix = keyState.getStateMatrix();
 
-        byte[] currentBlockArray = new byte[16];
-        int counter = 0;
 
-        for (int i = 0; i < currentStateMatrix.length; i++) {
+        for (int i = 0; i < textStateMatrix.length; i++) {
 
-            for (int j = 0; j < currentStateMatrix[0].length; j++) {
+            for (int j = 0; j < textStateMatrix[0].length; j++) {
 
-                currentBlockArray[counter++] = (byte)(textStateMatrix[i][j] ^ keyStateMatrix[i][j]);
+                textStateMatrix[i][j] = textStateMatrix[i][j] ^ keyStateMatrix[i][j];
             }
         }
-        currentState = new State(currentBlockArray, (byte)0);
     }
 
     private void shiftRows() {
 
-        byte[][] currentStateMatrix = currentState.getStateMatrix();
+        System.out.println("In shiftRows"); //TODO: delete line
+        int[][] currentStateMatrix = currentState.getStateMatrix();
 
         for (int i = 1; i < 4; i++) {
 
-            byte[] row = new byte[4];
+            int[] row = new int[4];
 
             for (int j = i; j < 4; j++) {
-                row[i - j] = currentStateMatrix[i][j];
+                row[j - i] = currentStateMatrix[i][j];// TODO: this is not right
             }
             int counter = 0;
             for (int j = 4 - i; j < 4; j++) {
@@ -62,13 +79,14 @@ public class AesRound {
 
     private void mixColumns() {
 
-        byte[][] currentStateMatrix = currentState.getStateMatrix();
+        System.out.println("In mixColumns"); //TODO: delete line
+        int[][] currentStateMatrix = currentState.getStateMatrix();
 
         for (int i = 0; i < 4; i++) {
 
             for (int j = 0; j < 4; j++) {
 
-                byte sum = 0;
+                int sum = 0;
                 for (int g = 0; g < 4; g++) {
 
                     sum ^= GaloisField.multiply(currentStateMatrix[g][i], diffusionMatrix[j][g]);

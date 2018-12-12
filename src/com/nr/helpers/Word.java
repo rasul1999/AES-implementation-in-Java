@@ -7,6 +7,7 @@ package com.nr.helpers;
 public class Word {
 
     private HexByte[] hexBytes = new HexByte[4];
+    private int[] bytes = new int[4];
 
     public HexByte get(int index) {
         if (index > 3) throw new ArrayIndexOutOfBoundsException("A word has only 4 bytes");
@@ -18,10 +19,16 @@ public class Word {
         hexBytes[index] = hexByte;
     }
 
-    public Word(byte[] bytes) {
+    public Word(int[] bytes) {
 
+        System.out.println("In word creation"); //TODO: delete line
         for (int i = 0; i < 4; i++) {
             hexBytes[i] = new HexByte(bytes[i]);
+            this.bytes[i] = bytes[i];
         }
+    }
+
+    public int[] getBytes() {
+        return bytes;
     }
 }

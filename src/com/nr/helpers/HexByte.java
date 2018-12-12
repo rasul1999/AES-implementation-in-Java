@@ -4,21 +4,22 @@ import java.util.ArrayList;
 
 public class HexByte {
 
-    public byte row = 0, column = 0;
-    private byte theByte;
+    public int row = 0, column = 0;
+    private int theByte;
 
-    public HexByte(byte b) {
+    public HexByte(int b) {
 
-        theByte = b;
+        System.out.println("In HexByte creation"); //TODO: delete line
+        theByte = Integer.valueOf(b);
 
-        ArrayList<Byte> list = new ArrayList<>();
+        ArrayList<Integer> list = new ArrayList<>();
 
         while (b > 0) {
-            list.add((byte)(b % 2));
+            list.add(b % 2);
             b /= 2;
         }
 
-        ArrayList<Byte> rlist = new ArrayList<>();
+        ArrayList<Integer> rlist = new ArrayList<>();
 
         for (int i = list.size() - 1; i >= 0; i--) {
             rlist.add(list.get(i));
@@ -34,7 +35,7 @@ public class HexByte {
         }
     }
 
-    public byte getByte() {
+    public int getByte() {
         return theByte;
     }
 }
