@@ -8,7 +8,6 @@ public class GaloisField {
 
     public static int multiply(int a, int b) {
 
-        System.out.println("In GaloisField multiply"); //TODO: delete line
         int ret = 0;
 
         while (a != 0 && b != 0) {

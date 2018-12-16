@@ -15,7 +15,6 @@ public class State {
 
     public State(int[] blockArray) {
 
-        System.out.println("In stateCreation"); //TODO: delete line
         stateMatrix = new int[4][4];
 
         int counter = 0;
@@ -33,7 +32,6 @@ public class State {
 
     private void updateWordVector() {
 
-        System.out.println("In updateWordVector"); //TODO: delete line
         wordVector = new Word[4];
 
         for (int i = 0; i < 4; i++) {
@@ -43,7 +41,6 @@ public class State {
 
     private void updateStateMatrix() {
 
-        System.out.println("In updateStateMatrix"); //TODO: delete line
         stateMatrix = new int[4][4];
 
         for (int i = 0; i < 4; i++) {
@@ -67,7 +64,6 @@ public class State {
 
     public int[] toByteArray() {
 
-        System.out.println("In toByteArray"); //TODO: delete line
         int[] byteArray = new int[16];
         int counter = 0;
 

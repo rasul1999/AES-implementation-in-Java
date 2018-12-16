@@ -1,18 +1,20 @@
-package com.nr.encryption;
+package com.nr;
 
+import com.nr.decryption.AesDecryptionRound;
+import com.nr.encryption.AesRound;
+import com.nr.helpers.OperationType;
 import com.nr.helpers.Segmentation;
 import com.nr.helpers.State;
 import com.nr.key_generation.Key;
 
 import java.util.ArrayList;
 
-public class Encryptor {
+public class Cryptor {
 
-    private int[] cipherTextBytes;
+    private int[] resultBytes;
 
-    public Encryptor(int[] plainTextBytes, int[] keyBytes) {
+    public Cryptor(int[] plainTextBytes, int[] keyBytes, OperationType operationType) {
 
-        System.out.println("In Encryptor constructor"); //TODO: delete line
         ArrayList<State> states = Segmentation.toStates(plainTextBytes);
         int[] properKeyBytes = new int[16];
         int keyLen = (keyBytes.length > 16 ? 16 : keyBytes.length);
@@ -26,26 +28,26 @@ public class Encryptor {
             properKeyBytes[i] = 0;
         }
 
-        Key key = new Key(properKeyBytes);
-
         for (int i = 0; i < states.size(); i++) {
+
+            Key key = new Key(properKeyBytes, operationType);
 
             for (int j = 0; j < 10; j++) {
 
-                try {
+                if (operationType == OperationType.ENCRYPTION) {
                     new AesRound(states.get(i), key);
-                    states.get(i).printState();
                 }
-                catch (Exception e) {
-                    System.out.println(e.getMessage());
-                    e.printStackTrace();
+                else {
+                    new AesDecryptionRound(states.get(i), key);
                 }
+
             }
         }
-        cipherTextBytes = Segmentation.fromStatesToBytes(states);
+        resultBytes = Segmentation.fromStatesToBytes(states);
     }
 
-    public int[] getCipherTextBytes() {
-        return cipherTextBytes;
+
+    public int[] getResultBytes() {
+        return resultBytes;
     }
 }

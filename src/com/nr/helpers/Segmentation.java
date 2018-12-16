@@ -6,15 +6,12 @@ import java.util.ArrayList;
 /**
  * byteArray is byte representation of plain text.
  */
-
-
 public class Segmentation {
 
     private static ArrayList<State> states = new ArrayList<>();
 
     public static int[] fromStatesToBytes(ArrayList<State> states) {
 
-        System.out.println("In fromStatesToBytes"); //TODO: delete line
         int[] byteArray = new int[states.size() * 16];
 
         int counter = 0;
@@ -32,7 +29,8 @@ public class Segmentation {
 
     public static ArrayList<State> toStates(int[] intArray) {
 
-        System.out.println("In toStates"); //TODO: delete line
+        states.clear();
+
         int startIndex = 0;
         int endIndex = 16;
 
@@ -51,7 +49,7 @@ public class Segmentation {
             endIndex += 16;
         }
 
-        if (endIndex - 16 != intArray.length) {
+        if (startIndex != intArray.length) {
 
             int[] stateArray = new int[16];
             int counter = 0;
@@ -60,10 +58,8 @@ public class Segmentation {
                 stateArray[counter++] = intArray[i];
             }
 
-            int b = 0;
-
             for (int i = counter; i < 16; i++) {
-                stateArray[i] = b;
+                stateArray[i] = 0;
             }
 
             states.add(new State(stateArray));

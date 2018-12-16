@@ -1,76 +1,25 @@
 package com.nr;
 
-import com.nr.encryption.Encryptor;
+import com.nr.helpers.Convert;
+import com.nr.helpers.OperationType;
 
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 
 
 public class Main {
 
-    private static int[] charToBytes(char c) {
-
-        System.out.println("In charToBytes"); //TODO: delete line
-        int intValue = (int)c;
-        int lowByte = 0;
-        int highByte = 0;
-
-        int counter = 0;
-        for (int i = 7; i >= 0; i--) {
-            highByte += Math.pow(2, counter++) * (intValue % 2);
-            intValue /= 2;
-        }
-        counter = 0;
-        for (int i = 7; i >= 0; i--) {
-            lowByte += Math.pow(2, counter++) * (intValue % 2);
-            intValue /= 2;
-        }
-        return new int[] {lowByte, highByte};
-    }
-
-    private static char bytesToChar(int[] bytes) {
-
-        System.out.println("In bytesToChar"); //TODO: delete line
-        return (char)(bytes[0] * 512 + bytes[1]);
-    }
-
-    private static int[] charToByteArray(char[] charArray) {
-
-        System.out.println("In charToByteArray"); //TODO: delete line
-        int[] ret = new int[charArray.length * 2];
-        int counter = 0;
-
-        for (int i = 0; i < charArray.length; i++) {
-
-            ret[counter++] = charToBytes(charArray[i])[0];
-            ret[counter++] = charToBytes(charArray[i])[1];
-        }
-        return ret;
-    }
-
-
-    private static char[] byteToCharArray(int[] byteArray) {
-
-        System.out.println("In byteToCharArray"); //TODO: delete line
-        char[] ret = new char[byteArray.length / 2];
-        int counter = 0;
-
-        for (int i = 0; i < byteArray.length; i += 2) {
-
-            int[] bytes = new int[] {byteArray[i], byteArray[i + 1]};
-            ret[counter++] = bytesToChar(bytes);
-        }
-        return ret;
-    }
-
-
-    public static void main(String[] args) {
+    // TODO: delete 'throws Exception'
+    public static void main(String[] args) throws Exception {
 
         String plainText = "", keyString = "";
 
         try {
 
             BufferedReader reader = new BufferedReader(
-                    new FileReader(new File(Resources.getProperty("path_to_plain_text")))
+                    new FileReader(new File(Resources.getProperty("plain_text_path")))
             );
             String line;
             while ((line = reader.readLine()) != null) {
@@ -78,7 +27,7 @@ public class Main {
             }
 
             reader = new BufferedReader(
-                    new FileReader(new File(Resources.getProperty("path_to_key")))
+                    new FileReader(new File(Resources.getProperty("key_path")))
             );
             while ((line = reader.readLine()) != null) {
                 keyString += line;
@@ -90,29 +39,52 @@ public class Main {
             e.printStackTrace();
         }
 
-        System.out.println(plainText);// TODO: delete this line
-        System.out.println(keyString);// TODO: delete this line
-
         char[] plainTextCharArray = plainText.toCharArray();
         char[] keyCharArray = keyString.toCharArray();
 
 
-        int[] plainTextArray = charToByteArray(plainTextCharArray);
-        int[] keyArray = charToByteArray(keyCharArray);
+        int[] plainTextArray = Convert.charToByteArray(plainTextCharArray);
+        int[] keyArray = Convert.charToByteArray(keyCharArray);
 
-        Encryptor aesEncryptor = new Encryptor(plainTextArray, keyArray);
+        Cryptor aesEncryptor = new Cryptor(plainTextArray, keyArray, OperationType.ENCRYPTION);
 
         try {
 
-            PrintWriter writer = new PrintWriter(Resources.getProperty("path_to_cipher_text"));
-            String resultString = String.valueOf(byteToCharArray(aesEncryptor.getCipherTextBytes()));
+            PrintWriter writer = new PrintWriter(Resources.getProperty("cipher_text_path"));
+            String resultString = String.valueOf(Convert.byteToCharArray(aesEncryptor.getResultBytes()));
             writer.write(resultString);
             writer.flush();
-        }
-        catch (FileNotFoundException e) {
+
+            Cryptor aesDecryptor = new Cryptor(
+                    Convert.charToByteArray(plainText.toCharArray()),
+                    Convert.charToByteArray(keyString.toCharArray()),
+                    OperationType.DECRYPTION
+            );
+            System.out.println(String.valueOf(Convert.byteToCharArray(aesDecryptor.getResultBytes())));
+
+        } catch (FileNotFoundException e) {
             System.out.println("Cipher text file not found");
             e.printStackTrace();
         }
 
+        {// TODO: experimental code
+            BufferedImage image = ImageIO.read(new File(Resources.getProperty("image_path")));
+            int[] imageArray = Convert.imageToByteArray(image);
+
+            Cryptor imageEncryptor = new Cryptor(imageArray, keyArray, OperationType.ENCRYPTION);
+
+            int[] cipherImageArray = imageEncryptor.getResultBytes();
+
+            BufferedImage cipherImage = Convert.byteArrayToImage(cipherImageArray, image.getWidth(), image.getHeight());
+
+            ImageIO.write(cipherImage, "png", new File(Resources.getProperty("cipher_image_path")));
+
+            BufferedImage decryptedImage = ImageIO.read(new File(Resources.getProperty("cipher_image_path")));
+            Cryptor imageDecryptor = new Cryptor(
+                    Convert.imageToByteArray(decryptedImage), keyArray, OperationType.DECRYPTION
+            );
+            decryptedImage = Convert.byteArrayToImage(imageDecryptor.getResultBytes(), image.getWidth(), image.getHeight());
+            ImageIO.write(decryptedImage, "png", new File(Resources.getProperty("decrypted_image_path")));
+        }
     }
 }

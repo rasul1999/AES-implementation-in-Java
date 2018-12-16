@@ -21,7 +21,6 @@ public class Word {
 
     public Word(int[] bytes) {
 
-        System.out.println("In word creation"); //TODO: delete line
         for (int i = 0; i < 4; i++) {
             hexBytes[i] = new HexByte(bytes[i]);
             this.bytes[i] = bytes[i];

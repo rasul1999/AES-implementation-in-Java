@@ -12,10 +12,10 @@ public class SBox {
 
     private int[][] sBoxMatrix;
     private static SBox sBox = null;
+    private static SBox inverseSBox = null;
 
     private SBox(File file) {
 
-        System.out.println("In SBox creation"); //TODO: delete line
         sBoxMatrix = new int[16][16];
 
         int counter = 0;
@@ -40,14 +40,26 @@ public class SBox {
         }
     }
 
-    public static SBox getSBox() {
+    public static SBox getSBox(OperationType type) {
 
-        if (sBox == null) {
+        if (type == OperationType.ENCRYPTION) {
 
-            String fileName = Resources.getProperty("path_to_sbox");
-            sBox = new SBox(new File(fileName));
+            if (sBox == null) {
+
+                String fileName = Resources.getProperty("sbox_path");
+                sBox = new SBox(new File(fileName));
+            }
+            return sBox;
         }
-        return sBox;
+        else {
+
+            if (inverseSBox == null) {
+
+                String fileName = Resources.getProperty("inv_sbox_path");
+                inverseSBox = new SBox(new File(fileName));
+            }
+            return inverseSBox;
+        }
     }
 
     public int[][] getSBoxMatrix() {
@@ -55,10 +67,9 @@ public class SBox {
     }
 
 
-    public static void substituteBytes(State currentState) {
+    public static void substituteBytes(State currentState, OperationType operationType) {
 
-        System.out.println("In SBox substituteBytes"); //TODO: delete line
-        int[][] sBoxMatrix = getSBox().getSBoxMatrix();
+        int[][] sBoxMatrix = getSBox(operationType).getSBoxMatrix();
         int[][] currentStateMatrix = currentState.getStateMatrix();
         Word[] currentStateWordVector = currentState.getWordVector();
 
@@ -68,6 +79,7 @@ public class SBox {
 
                 int row = currentStateWordVector[i].get(j).row;
                 int col = currentStateWordVector[i].get(j).column;
+//                System.out.printf("Row: %d, Col: %d | ", row, col);
 
                 currentStateMatrix[i][j] = sBoxMatrix[row][col];
             }

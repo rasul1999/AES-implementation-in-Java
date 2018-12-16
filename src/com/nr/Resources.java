@@ -10,7 +10,6 @@ public class Resources {
 
     static  {
 
-        System.out.println("In Resources static block"); //TODO: delete line
         properties = new Properties();
 
         InputStream inputStream = Resources.class.getClassLoader().getResourceAsStream("aes.properties");

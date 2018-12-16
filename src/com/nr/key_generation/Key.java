@@ -1,29 +1,28 @@
 package com.nr.key_generation;
 
 
-import com.nr.helpers.HexByte;
-import com.nr.helpers.SBox;
-import com.nr.helpers.State;
-import com.nr.helpers.Word;
+import com.nr.helpers.*;
 
 
 public class Key {
 
     private State keyState;
     private int roundCount;
+    private OperationType operationType;
     private static final int[] rcon = new int[] {
             0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36
     };
 
-    public Key(int[] keyBytes) {
+    public Key(int[] keyBytes, OperationType operationType) {
+
+        this.operationType = operationType;
         keyState = new State(keyBytes);
         roundCount = 0;
     }
 
     private void rotateWord(Word w) {
 
-        System.out.println("In rotateWord"); //TODO: delete line
-        HexByte firstByte = w.get(0);// TODO: not right
+        HexByte firstByte = new HexByte(w.get(0).getByte());
 
         for (int i = 0; i < 3; i++) {
             w.set(i, w.get(i + 1));
@@ -33,8 +32,7 @@ public class Key {
 
     private void substituteWord(Word w) {
 
-        System.out.println("In substituteWord"); //TODO: delete line
-        int[][] sBoxMatrix = SBox.getSBox().getSBoxMatrix();
+        int[][] sBoxMatrix = SBox.getSBox(operationType).getSBoxMatrix();
 
         for (int i = 0; i < 4; i++) {
             int row = w.get(i).row;
@@ -45,7 +43,6 @@ public class Key {
 
     private Word xor(Word w1, Word w2) {
 
-        System.out.println("In xor(w1, w2)"); //TODO: delete line
         int[] resultBytes = new int[4];
 
         for (int i = 0; i < 4; i++) {
@@ -63,7 +60,6 @@ public class Key {
 
     public void switchToNextKey() {
 
-        System.out.println("In switchToNextKey"); //TODO: delete line
         Word[] words = keyState.getWordVector();
         Word lastWord = new Word(words[3].getBytes());
 
@@ -79,7 +75,8 @@ public class Key {
 
         keyState.updateState(State.Changed.WORD_VECTOR);
 
-        if (roundCount == 9) {
+        if (roundCount == 10) {
+
             roundCount = 0;
         }
     }

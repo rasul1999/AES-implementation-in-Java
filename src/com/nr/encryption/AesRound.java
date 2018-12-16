@@ -1,6 +1,7 @@
 package com.nr.encryption;
 
 import com.nr.helpers.GaloisField;
+import com.nr.helpers.OperationType;
 import com.nr.helpers.SBox;
 import com.nr.helpers.State;
 import com.nr.key_generation.Key;
@@ -8,14 +9,16 @@ import com.nr.key_generation.Key;
 
 public class AesRound {
 
-    private State keyState, currentState;
-    private int[][] diffusionMatrix;
-    private static int roundCount = 0;
+    protected State keyState, currentState;
+    protected int[][] diffusionMatrix;
+    protected static int roundCount = 0;
 
+    protected AesRound() {}
 
-    public AesRound(State plainTextState, Key key) throws Exception {
+    public AesRound(State plainTextState, Key key) {
 
-        System.out.println("In AesRound constructor"); //TODO: delete line
+        System.out.println("In AES round " + roundCount);
+
         keyState = key.getState();
         currentState = plainTextState;
 
@@ -29,21 +32,21 @@ public class AesRound {
         if (roundCount == 0) {
             addRoundKey();
         }
-        SBox.substituteBytes(currentState);
+        SBox.substituteBytes(currentState, OperationType.ENCRYPTION);
         shiftRows();
         if (roundCount != 9) {
             mixColumns();
         }
         key.switchToNextKey();
         addRoundKey();
-        if (roundCount == 9) {
+        roundCount++;
+        if (roundCount == 10) {
             roundCount = 0;
         }
     }
 
-    private void addRoundKey() {
+    protected void addRoundKey() {
 
-        System.out.println("In addRoundKey"); //TODO: delete line
         int[][] textStateMatrix = currentState.getStateMatrix();
         int[][] keyStateMatrix = keyState.getStateMatrix();
 
@@ -52,14 +55,14 @@ public class AesRound {
 
             for (int j = 0; j < textStateMatrix[0].length; j++) {
 
-                textStateMatrix[i][j] = textStateMatrix[i][j] ^ keyStateMatrix[i][j];
+                textStateMatrix[i][j] ^= keyStateMatrix[i][j];
             }
         }
+        currentState.updateState(State.Changed.STATE_MATRIX);
     }
 
-    private void shiftRows() {
+    protected void shiftRows() {
 
-        System.out.println("In shiftRows"); //TODO: delete line
         int[][] currentStateMatrix = currentState.getStateMatrix();
 
         for (int i = 1; i < 4; i++) {
@@ -67,19 +70,19 @@ public class AesRound {
             int[] row = new int[4];
 
             for (int j = i; j < 4; j++) {
-                row[j - i] = currentStateMatrix[i][j];// TODO: this is not right
+                row[j - i] = currentStateMatrix[i][j];
             }
             int counter = 0;
             for (int j = 4 - i; j < 4; j++) {
                 row[j] = currentStateMatrix[i][counter++];
             }
+            currentStateMatrix[i] = row;
         }
         currentState.updateState(State.Changed.STATE_MATRIX);
     }
 
-    private void mixColumns() {
+    protected void mixColumns() {
 
-        System.out.println("In mixColumns"); //TODO: delete line
         int[][] currentStateMatrix = currentState.getStateMatrix();
 
         for (int i = 0; i < 4; i++) {
