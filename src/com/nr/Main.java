@@ -81,9 +81,9 @@ public class Main {
 
             ImageIO.write(cipherImage, "png", new File(Resources.getProperty("cipher_image_path")));
 
-            BufferedImage decryptedImage = ImageIO.read(new File(Resources.getProperty("cipher_image_path")));
+            BufferedImage encryptedImage = ImageIO.read(new File(Resources.getProperty("cipher_image_path")));
             Cryptor imageDecryptor = new Cryptor(
-                    Convert.imageToByteArray(decryptedImage), keyArray, OperationType.DECRYPTION
+                    Convert.imageToByteArray(encryptedImage), keyArray, OperationType.DECRYPTION
             );
             decryptedImage = Convert.byteArrayToImage(imageArray, image.getWidth(), image.getHeight());
             ImageIO.write(decryptedImage, "png", new File(Resources.getProperty("decrypted_image_path")));
