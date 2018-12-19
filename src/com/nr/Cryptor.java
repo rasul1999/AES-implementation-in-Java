@@ -29,7 +29,7 @@ public class Cryptor {
         }
 
         for (int i = 0; i < states.size(); i++) {
-
+            System.out.println("In block " + (i + 1) + " **********************");
             Key key = new Key(properKeyBytes, operationType);
 
             for (int j = 0; j < 10; j++) {

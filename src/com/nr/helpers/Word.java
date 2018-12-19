@@ -10,12 +10,12 @@ public class Word {
     private int[] bytes = new int[4];
 
     public HexByte get(int index) {
-        if (index > 3) throw new ArrayIndexOutOfBoundsException("A word has only 4 bytes");
+        if (index > 3) throw new IndexOutOfBoundsException("A word has only 4 bytes");
         return hexBytes[index];
     }
 
     public void set(int index, HexByte hexByte) {
-        if (index > 3) throw new ArrayIndexOutOfBoundsException("A word has only 4 bytes");
+        if (index > 3) throw new IndexOutOfBoundsException("A word has only 4 bytes");
         hexBytes[index] = hexByte;
     }
 

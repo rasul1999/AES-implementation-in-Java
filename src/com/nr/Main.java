@@ -11,7 +11,6 @@ import java.io.*;
 
 public class Main {
 
-    // TODO: delete 'throws Exception'
     public static void main(String[] args) throws Exception {
 
         String plainText = "", keyString = "";
@@ -35,7 +34,7 @@ public class Main {
 
         } catch (IOException e) {
 
-            System.out.printf("Plain text file not found");
+            System.out.println("Plain text file not found");
             e.printStackTrace();
         }
 
@@ -60,14 +59,17 @@ public class Main {
                     Convert.charToByteArray(keyString.toCharArray()),
                     OperationType.DECRYPTION
             );
-            System.out.println(String.valueOf(Convert.byteToCharArray(aesDecryptor.getResultBytes())));
+
+            writer = new PrintWriter(Resources.getProperty("decrypted_text_path"));
+            writer.write(String.valueOf(Convert.byteToCharArray(plainTextArray)));
+            writer.flush();
 
         } catch (FileNotFoundException e) {
             System.out.println("Cipher text file not found");
             e.printStackTrace();
         }
 
-        {// TODO: experimental code
+        {// TODO: image encryption - decryption
             BufferedImage image = ImageIO.read(new File(Resources.getProperty("image_path")));
             int[] imageArray = Convert.imageToByteArray(image);
 
@@ -83,7 +85,7 @@ public class Main {
             Cryptor imageDecryptor = new Cryptor(
                     Convert.imageToByteArray(decryptedImage), keyArray, OperationType.DECRYPTION
             );
-            decryptedImage = Convert.byteArrayToImage(imageDecryptor.getResultBytes(), image.getWidth(), image.getHeight());
+            decryptedImage = Convert.byteArrayToImage(imageArray, image.getWidth(), image.getHeight());
             ImageIO.write(decryptedImage, "png", new File(Resources.getProperty("decrypted_image_path")));
         }
     }

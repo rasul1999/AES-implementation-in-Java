@@ -43,6 +43,7 @@ public class AesRound {
         if (roundCount == 10) {
             roundCount = 0;
         }
+        currentState.printState();
     }
 
     protected void addRoundKey() {

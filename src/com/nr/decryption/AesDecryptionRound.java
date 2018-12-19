@@ -11,7 +11,7 @@ public class AesDecryptionRound extends AesRound {
 
     public AesDecryptionRound(State cipherTextState, Key key) {
 
-        System.out.println("In AES decryption round: " + roundCount);
+        System.out.println("In AES decryption round " + roundCount);
 
         keyState = key.getState();
         currentState = cipherTextState;
@@ -37,6 +37,7 @@ public class AesDecryptionRound extends AesRound {
         if (roundCount == 10) {
             roundCount = 0;
         }
+        currentState.printState();
     }
 
     @Override

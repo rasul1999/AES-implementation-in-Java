@@ -27,20 +27,20 @@ public class Segmentation {
         return byteArray;
     }
 
-    public static ArrayList<State> toStates(int[] intArray) {
+    public static ArrayList<State> toStates(int[] byteArray) {
 
         states.clear();
 
         int startIndex = 0;
         int endIndex = 16;
 
-        while (endIndex <= intArray.length) {
+        while (endIndex <= byteArray.length) {
 
             int[] stateArray = new int[16];
             int counter = 0;
 
             for (int i = startIndex; i < endIndex; i++) {
-                stateArray[counter++] = intArray[i];
+                stateArray[counter++] = byteArray[i];
             }
 
             states.add(new State(stateArray));
@@ -49,13 +49,13 @@ public class Segmentation {
             endIndex += 16;
         }
 
-        if (startIndex != intArray.length) {
+        if (startIndex != byteArray.length) {
 
             int[] stateArray = new int[16];
             int counter = 0;
 
-            for (int i = startIndex; i < intArray.length; i++) {
-                stateArray[counter++] = intArray[i];
+            for (int i = startIndex; i < byteArray.length; i++) {
+                stateArray[counter++] = byteArray[i];
             }
 
             for (int i = counter; i < 16; i++) {

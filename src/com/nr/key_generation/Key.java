@@ -9,6 +9,7 @@ public class Key {
     private State keyState;
     private int roundCount;
     private OperationType operationType;
+
     private static final int[] rcon = new int[] {
             0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36
     };
@@ -76,7 +77,6 @@ public class Key {
         keyState.updateState(State.Changed.WORD_VECTOR);
 
         if (roundCount == 10) {
-
             roundCount = 0;
         }
     }
